@@ -1,0 +1,8 @@
+{
+  dockerComposeFile: [
+    "../docker-compose.yaml"
+  ],
+  service: "aws-backend",
+  remoteUser: "root",
+  workspaceFolder: "/workspaces/${localWorkspaceFolderBasename}"
+}
