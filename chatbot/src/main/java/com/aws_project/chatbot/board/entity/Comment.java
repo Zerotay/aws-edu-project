@@ -1,15 +1,18 @@
 package com.aws_project.chatbot.board.entity;
 
+import com.aws_project.chatbot.board.dto.CommentUpdateRequestDto;
 import com.aws_project.chatbot.common.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.SQLDelete;
 
 @Entity
 @Getter
 @Builder
-@AllArgsConstructor
 @SQLRestriction("is_deleted = 0")
+@SQLDelete(sql = "update Comment set is_deleted=1 where id = ?")
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment  extends BaseEntity {
     @Id
@@ -22,4 +25,13 @@ public class Comment  extends BaseEntity {
     private Board board;
     private String content;
 
+    public static Comment update(Comment comment, CommentUpdateRequestDto commentUpdateRequestDto) {
+        return Comment.builder()
+                .id(comment.getId())
+                .nickname(comment.getNickname())
+                .password(comment.getPassword())
+                .board(comment.getBoard())
+                .content(commentUpdateRequestDto.getContent())
+                .build();
+    }
 }

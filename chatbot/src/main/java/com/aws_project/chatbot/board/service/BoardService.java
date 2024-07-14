@@ -1,8 +1,6 @@
 package com.aws_project.chatbot.board.service;
 
-import com.aws_project.chatbot.board.dto.BoardCreateRequestDto;
-import com.aws_project.chatbot.board.dto.BoardListRequestDto;
-import com.aws_project.chatbot.board.dto.BoardListResponseDto;
+import com.aws_project.chatbot.board.dto.*;
 import com.aws_project.chatbot.board.entity.Board;
 import com.aws_project.chatbot.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class BoardService {
     private final BoardRepository boardRepository;
 
     @Transactional
-    public Board create(BoardCreateRequestDto boardCreateRequestDto) {
+    public Long create(BoardCreateRequestDto boardCreateRequestDto) {
         Board board = Board.builder()
                 .nickname(boardCreateRequestDto.getNickname())
                 .password(boardCreateRequestDto.getPassword())
@@ -26,9 +24,37 @@ public class BoardService {
                 .content(boardCreateRequestDto.getContent())
                 .build();
 
-        return boardRepository.save(board);
+        return boardRepository.save(board).getId();
     }
 
-//    public Page<BoardListResponseDto> search(BoardListRequestDto boardListRequestDto, Pageable pageable) {
-//    }
+    @Transactional(readOnly = true)
+    public Page<BoardListResponseDto> search(BoardListRequestDto boardListRequestDto, Pageable pageable) {
+        return boardRepository.searchBoardCustom(boardListRequestDto, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public BoardDetailResponseDto getDetail(Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(RuntimeException::new);
+        return BoardDetailResponseDto.toBoardDetailResponseDto(board);
+    }
+
+    public void delete(Long boardId, BoardDeleteRequestDto boardDeleteRequestDto) {
+        // check passwd
+        Board board = boardRepository.findById(boardId).orElseThrow(RuntimeException::new);
+        if (!board.getPassword().equals(boardDeleteRequestDto.getPassword())) {
+            throw new RuntimeException();
+
+        }
+        boardRepository.deleteById(boardId);
+//        boardRepository.delete(board);
+    }
+
+    public Long update(Long boardId, BoardUpdateRequestDto boardUpdateRequestDto) {
+        Board board = boardRepository.findById(boardId).orElseThrow(RuntimeException::new);
+        if (!board.getPassword().equals(boardUpdateRequestDto.getPassword())) {
+            throw new RuntimeException();
+        }
+        boardRepository.save(Board.update(board, boardUpdateRequestDto));
+        return boardId;
+    }
 }
