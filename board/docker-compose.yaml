@@ -1,13 +1,4 @@
 services:
-  # web:
-  #   container_name: nginx
-  #   image: hsyoodev/gplayus-dev-nginx:1.0
-  #   ports:
-  #     - 80:80
-  #   volumes:
-  #     - nginx:/etc/nginx
-  #   depends_on:
-  #     - application
   aws-backend:
     container_name: spring-boot
     build:
@@ -21,8 +12,8 @@ services:
     container_name: mysql
     image: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: main
-      MYSQL_DATABASE: chatbot
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: board
       MYSQL_USER: aws-user
       MYSQL_PASSWORD: aws-user
     volumes:
