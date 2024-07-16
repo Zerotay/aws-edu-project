@@ -1,9 +1,10 @@
 FROM amazonlinux:2023 AS builder
 ARG APP=board
 USER root
-RUN dnf update && dnf install -y java-17-amazon-corretto-devel
+RUN dnf update && dnf install -y java-17-amazon-corretto-devel findutils
 # RUN dnf install -y libXext libXrender libXtst libXi freetype procps 
 COPY $APP /$APP
+COPY application.yml /$APP/src/main/resources/application.yml
 WORKDIR $APP
 RUN sh gradlew clean bootJar
 

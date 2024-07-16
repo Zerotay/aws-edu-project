@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: board
+  main:
+    time-zone: Asia/Seoul
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://db.cpc2yqq60f8z.ap-northeast-2.rds.amazonaws.com:3306/board?useSSL=false&&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: admin
+    password: abcd1234
+
+
+  jpa:
+    # open-in-view: true
+    hibernate:
+      ddl-auto: create
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      # use-new-id-generator-mappings: false
+    show-sql: true
+    properties:
+      hibernate.format_sql: true
+      dialect: org.hibernate.dialect.MySQL8InnoDBDialect
+
+
+logging:
+  level:
+    org.hibernate.SQL: debug
