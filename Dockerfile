@@ -4,7 +4,7 @@ USER root
 RUN dnf update && dnf install -y java-17-amazon-corretto-devel findutils
 # RUN dnf install -y libXext libXrender libXtst libXi freetype procps 
 COPY $APP /$APP
-COPY application.yml /$APP/src/main/resources/application.yml
+# COPY application.yml /$APP/src/main/resources/application.yml
 WORKDIR $APP
 RUN sh gradlew clean bootJar
 
@@ -18,6 +18,7 @@ ENV TZ=Asia/Seoul
 EXPOSE 8080
 # COPY build/$APP/application.yml .
 COPY --from=builder /$APP/build/libs/*.jar .
+COPY application.yml .
 # COPY build/$APP/output.cert .
 # RUN keytool -importcert -cacerts -storepass changeit -file output.cert -alias letsencrypt -noprompt
 CMD [ "java", "-Dfile.encoding=utf-8","-jar", "-XX:InitialHeapSize=1M", "-XX:MaxHeapSize=2G", "-XX:MinHeapSize=1M", "/board-0.0.1-SNAPSHOT.jar"]
