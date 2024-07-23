@@ -2,13 +2,16 @@ package com.aws_project.board.board.repository;
 
 import com.aws_project.board.board.dto.BoardListRequestDto;
 import com.aws_project.board.board.dto.BoardListResponseDto;
+import com.aws_project.board.board.entity.Board;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -30,6 +33,14 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
     @Override
     public Page<BoardListResponseDto> searchBoardCustom(BoardListRequestDto boardListRequestDto, Pageable pageable) {
 //        QBoard board = QBoard.board;
+        JPAQuery<Long> count = jpaQueryFactory
+                .select(board.count())
+                .from(board)
+                .where(
+                        eqNickname(boardListRequestDto.getNickname()),
+                        eqTitle(boardListRequestDto.getTitle())
+                );
+
         List<BoardListResponseDto> result = jpaQueryFactory
                 .select(Projections.constructor(BoardListResponseDto.class,
                         board.id,
@@ -42,10 +53,10 @@ public class BoardRepositoryCustomImpl implements BoardRepositoryCustom{
                         eqNickname(boardListRequestDto.getNickname()),
                         eqTitle(boardListRequestDto.getTitle())
                 )
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())   // (2) 페이지 번호
+                .limit(pageable.getPageSize())  // (3) 페이지 사이즈
                 .fetch();
-        return new PageImpl<>(result, pageable, result.size());
+        return PageableExecutionUtils.getPage(result, pageable, count::fetchOne);
     }
 
     private BooleanExpression eqNickname(String nickname){
